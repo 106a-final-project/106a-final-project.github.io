@@ -1,0 +1,394 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css?">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Open+Sans:ital,wght@0,400;0,700;1,600&display=swap"
+        rel="stylesheet">
+		
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	
+	<title>C106A Final project</title>
+	
+	<style>
+	.toc-panel {
+		background-color: #f9f9f9;
+		position: sticky;
+		width: 300px;
+		height: 95vh;
+		top: 20px;
+		margin-right: 40px;
+		margin-top: 10px;
+		overflow-y: scroll;
+		padding-right: 25px;
+		border-right: 1px solid rgb(230, 230, 230);
+	}
+	.toc-panel::-webkit-scrollbar-track {
+		  box-shadow: inset 0 0 5px #DADADA; 
+		  border-radius: 10px;
+	}
+	 
+	.toc-panel::-webkit-scrollbar-thumb {
+		  background: #61B649; 
+		  border-radius: 10px;
+	}
+	.toc-panel::-webkit-scrollbar {
+		width: 0.2rem;
+	}
+	
+	.wrapper {
+		display: flex;
+		margin:5px:
+	}
+	.small-margins {
+		margin-right: 10px;
+		margin-left: 0px;
+		margin-top: 1px;
+		border-color: #61B649;
+		border-width:3px;
+		border-style:solid;
+	}
+	.divider {
+		background: #9E49B6;
+		width: 100%;
+		height: 6px;
+		border-radius: 20px;
+		margin: 20px 0;
+	}
+	.margins {
+		margin-left:1rem;
+		margin-right:1rem;
+	}
+	
+	a.link:link
+	{
+	   color: black;
+	   text-decoration: none;
+	}
+	a.link:visited
+	{
+	   color: black;
+	   text-decoration: none;
+	}
+	a.link:hover
+	{
+	   color: #2980b9;
+	   text-decoration: underline;
+	}
+	a.link:active
+	{
+	   color: #fb3f00;
+	   text-decoration: underline;
+	}
+	
+	.toc-ul {
+		padding-inline-start:20px;
+	} 
+	
+	.content {
+		width: 100%;
+	}
+	
+	ul {
+		margin-top:5px;
+	}
+	
+	
+	body {
+		font-family: 'Arial', sans-serif;
+		line-height: 1.6;
+		font-size: 16px;
+		color: #333;
+		background-color: #f9f9f9;
+		padding: 20px;
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	h1, h2, h3, h4 {
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		color: #2c3e50;
+		line-height: 1.3;
+		margin-top:15px;
+		margin-bottom:15px;
+	}
+	
+	p {
+		margin-top:5px;
+		margin-bottom:5px;
+		color: #555;
+		text-align: justify;
+	}
+	
+	</style>
+</head>
+
+
+<body>
+	<h1 align="center"> Final project 106a </h1>
+	<h2 align="center"> Made by Gabriel Taboada, Sanzhar Abatov, Artem Shumay</h2>
+	<div class="divider"> </div>
+	<div class="margins wrapper">
+		<div class="toc-panel" id="toc">
+			<h3>Table of Contents</h3>
+		</div>
+		
+		<!-- <hr class="small-margins"> -->
+		
+		<div class="content" id="contents">
+			<h1> Introduction </h1>
+			<h2> Goal </h2>
+			<p> The project’s objective is to explore and understand the capabilities of the Berkeley Tech tactile sensor, in particular, its ability to detect slip. <p>
+			
+			<h2> Method </h2>
+			<p> We aim to create an inverted pendulum setup that balances an object using the tactile sensor, without/ minimally relying on other sensing. 
+					A camera will be employed to detect the pendulum’s motion. 
+					The camera serves multiple purposes: collecting ground truth, evaluating the sensor data, and acting as a backup control system. </p>
+			<h2> Initial Goals </h2>
+			<p> <ul> 
+				<li>Sense when rotation occurs.</li>
+				<li>Detect the direction in which the pendulum starts to swing.</li>
+				<li>Catch the pendulum at a given quadrant.</li>
+				<li>Predict the pendulum’s angle (theta).</li>
+				<li>Catch the pendulum at a specified angle.</li>
+				</ul></p>
+				
+			<h2> Interest and Challenges </h2>
+			<p> This project has several interesting components, both theoretical and practical. 
+				We found that modeling friction, determining grasping points, and using friction as input for control were quite interesting though they extend beyond the scope of this class.
+				On the practical side, The sensor's have many different input/output modes, some of which are configurable, each suited for different types of measurements  affecting the sampling frequency and the precision in different ways, all output large swathes of noisy data.
+				Collecting useful data, and navigating through large datasets to extract meaningful insights was demanding but very interesting (especially before we thought to hook up the camera). 
+				Additionally the sensors are proof of concept and their manufacturing isn’t perfect so we had to think of clever ways to hook them up and clever modifications to the gripper in order to better process their data. 
+				Lastly, working with unfamiliar motors and ensuring seamless integration between the sensors, camera, and motors adds an additional layer of complexity. </p>
+			
+			<h2> Real-World Applications </h2>
+			<p> The insights and methods developed through this project have the potential to impact various fields of robotics, including:
+				<ul> 
+				<li>Tactile-based robotic arms for manufacturing and assembly tasks.</li>
+				<li>Grippers with enhanced feedback control for delicate object handling.</li>
+				<li>Adaptive systems in prosthetics, where fine tactile sensing and control are essential.</li>
+				</ul>
+			</p>
+			
+			<div class="divider"> </div>
+			<h1> Design </h1>
+			
+			<h2> Design Criteria </h2>
+				<p> The system must:
+					<ul> 
+						<li>Grip the pendulum securely.</li>
+						<li>Provide sufficient sliding range for the inverted pendulum swing.</li>
+						<li>Process sensor data in real-time.</li>
+						<li>Reliably balance the pendulum using primarily tactile feedback.</li>
+						<li>Facilitate easy detection and state derivation by the camera.</li>
+
+					</ul>
+				</p>
+				
+			<h2> Chosen Design </h2>
+			<p> The system features 4 main components: Linear Actuator, Gripper, Tactile Sensor, Camera.
+				Linear actuator setup includes Linear Rails, Linear Rail Mounting, Cart Mounting, GearBox and a MOOG Animatics Servo Smart Motor.
+				This setup allows a motorized cart moving forward and backward along the metal rails. </p>
+				
+			<p> On the cart, we have a hardware setup with the main components for the implementation of the inverse pendulum sensing and actuation. We 3D printed an adapter to mount this hardware setup to the cart. Additionally, we had 2 iterations of the Rail Adapter and Power Hub Board mounting to ensure a rigid setup, since there are multiple vibration sources in the system.  </p>
+			<p> Hardware setup had Water-jetted gripper parts and 3D Printed PLA clamps. This design was chosen because of the simplicity and effectiveness it provides for our goal. Gripper is actuated by a Dynamixel MX-28R Motor, controller and driver. Originally, each finger had a SlipTack sensor glued to it. However, after several experiments, our group realized that making and calculating this dynamic model that includes rotational friction and translational friction that also vary with the surface of the sensor (2 fingers of the gripper were not assembled perfectly, thus facing sides are not parallel to each other) would be too hard of a challenge in the time we had. Therefore, the decision was made to uninstall one of the sensors and instead have a pivot base. By doing that, we eliminated the translational friction and only have 1 DOF. </p>
+			<p> After we pivoted towards using the camera for validation and sensing, we set the Logitech C920 web camera on the tripod that we adjusted making the camera’s z axis coincident with the axis of rotation. </p>
+			 
+			 <h2> Design Choices and Trade-offs </h2>
+			 <p> Key design choices included:
+					<ul> 
+						<li>Gripper and Tactile Sensor: Initially, we had tactile sensors on both sides as grippers. However, this approach introduced complications because the interactions between the nibs on both sides caused additional wobble, and synchronizing the sensors added unnecessary complexity. Although having two sensors could have improved reliability during sensor failures, we opted to replace one sensor with the mentioned 3D-printed attachment. This adjustment simplified the system while retaining its functionality.
+						<li>Camera Detection: We initially used AprilTags for localization because we’ve been using them in class and they have low computational overhead and high accuracy. However, motion blur rendered them completely impractical. Instead, inspired by the lab, we adopted detecting color boxes using HSV thresholds. By finding the median x and y positions of the color boxes, we achieved an approximate location of the pendulum. This approach traded some precision for reliability and proved sufficient for our needs.
+						<li>Pendulum Variations: Different pendulum designs produced varying effects. Longer pendulums were harder to swing up, while wider and heavier pendulums provided a more stable range of upright positions due to increased contact with the gripper. We tested several designs to find the optimal configuration.
+						<li>Hardware Integration: A notable challenge was integrating the sensor and motor within our setup. Limited space often required setting up laptops in awkward positions, which complicated debugging and adjustments. This is a design choice we would reconsider in future iterations.
+					</ul>
+				</p>
+			
+			<h2> Impact on Engineering Criteria </h2>
+			<p> The chosen design emphasizes robustness, simplicity, and adaptability.
+				When you really break it down the whole system is extremely simple, just a cart and a motor.
+				The back up sensor ensures robustness </p>
+				
+			<div class="divider"> </div>
+			<h1> Implementation </h1>
+			<h2> Hardware </h2>
+				<ul> 
+					<li> Sensors 
+						<ul> 
+							<li>Programmable Slip Tactile Sensor (SlipTack)
+							<li>Web Camera (Logitech C920)
+						</ul>
+					</li>
+					
+					<li> Actuators 
+						<ul> 
+							<li>Dynamixel MX-28R motor
+							<li>MOOG Animatics Smart Motor
+						</ul>
+					</li>
+					
+					<li> Mechanical Components 
+						<ul> 
+							<li>1-DOF Parallel Jaw Gripper, Water Jet (aluminum 0.125”)
+							<li>3D Printed PLA Fingers
+							<li>Linear Rails (MSA-R15)
+							<li>GearBox (MPG-064)
+							<li>Mounts and Adapters (3D Printed PLA)
+						</ul>
+					</li>
+				</ul>
+			<h2> Software </h2>	
+			<p> Software components:
+				<ul> 
+					<li> No ROS since the flow of the program was pretty straightforward and because of hardware limitations. </li>
+					<li> Multiprocessed code for the motor to have minimal delays. Controller class has an interface which talks to it through a queue and is abstracted away for the user.</li>
+					<li> Has several modes of operation: position mode, relative position mode, torque mode.<li>
+					<li> Boundary control to stop before hitting the edge.</li>
+					<li> Motor takes updates mid-trajectory and knows when it reached goal position</li>
+
+				</ul>
+			</p>
+			<h2> System Workflow </h2>	
+			<p>
+				<ul> 
+					<li> Tactile sensors detect grip and provide raw data.
+					<li> The estimated angle, position, and velocities are computed and sent to the controller
+					<li> The motor control node actuates the pendulum based on calculated inputs to maintain balance.
+				</ul>
+			</p>
+			<div class="divider"> </div>
+			<h1> Results </h1>
+			<h2> How well did your project work? What tasks did it perform? </h2>
+			<p> Our project achieved several milestones
+				<ul> 
+					<li>We successfully achieved most of the initial goals, though with varying levels of success:
+						<ul> 
+							<li>Detect the direction in which the pendulum starts to swing.
+							<li>Sense when rotation occurs.
+							<li>Catch the pendulum at a given quadrant.
+						</ul>
+					<li>However, tasks like predicting the pendulum’s angle (theta) and catching the pendulum at a specified angle were only partially successful due to the unreliability of the sensors.
+				</ul>
+				Additionally we
+				<ul> 
+					<li>Improved sensor reliability by constructing new mounts for the gripper hand and adding a visualization tool to monitor sensor inputs. This enabled us to identify and track slipping events.
+					<li>Built and validated a simulation of the system using Lagrangian mechanics with a friction damping term. The simulation constrained motor speed to prevent the pendulum from detaching from the gripper, assuming no vertical or horizontal slipping.
+					<li>Created and implemented HSV tags for the pendulum to detect its position, length, and angle in video recordings. This served as a ground truth testing method and a backup tracking system.
+				</ul>
+				We also tried integrating the simulation with the robot. While the simulation worked well, the sensor readings proved challenging due to high noise levels and uncertain responsiveness when confronted with small rotations. Testing with TFT and filtering revealed some capability in detecting rotation and slipping using vibrations frequencies and the sensor's computed rotational differential, but this was never reliable. We had to fall back significantly to the camera system.
+			</p>
+			
+			<h2> Pictures and videos  TODOOOO</h2>
+			<div class="divider"> </div>
+			
+			<h1> Conclusion </h1>
+			<h2> Discuss your results. How well did your finished solution meet your design criteria? </h2>
+			<p> The project met most of the design criteria. The tactile sensor effectively monitored grip strength and sliding behavior, while the simulation accurately modeled pendulum dynamics. However, sensor unreliability and noise significantly impacted performance. Small theta changes were difficult to detect with the current sensor configuration, and camera tracking had a lower refresh rate than desired. </p>
+			
+			<h2> Did you encounter any particular difficulties? </h2>
+			<p> Challenges included
+				<ul> 
+					<li>Hardware setup, particularly the horizontal gripper, which required precise alignment.
+					<li>Over-reliance on the tactile sensor, which often produced noisy and unreliable data.
+					<li>The low refresh rate of the camera when used as a fallback tracking method.
+					<li>Wobble on pendulum as an effect of the grip produced by the tactile gripper. The way in which contact points vibrate and slip causes a wobble on the pendulum that interrupts sensor readings (the weaker the grip the worse the wobble).
+				</ul>
+			</p>
+			
+			<h2> Does your solution have any flaws or hacks? What improvements would you make if you had additional time? </h2>
+				<ul> 
+					<li>Flaws:
+						<ul> 
+							<li>The proof-of-concept tactile sensor exhibited high noise levels and occasional data loss.
+							<li>Simplified HSV-based camera tracking sacrificed precision for reliability.
+							<li>The simulation assumed ideal conditions, which limited its real-world applicability.
+						</ul>
+					<li>Flaws:
+						<ul> 
+							<li>Fabricate a new set of SlipTack sensors with improved reliability and reduced noise.
+							<li>Enhance the dynamic model to include more advanced friction calculations and reduce assumptions about contact points.
+							<li>Conduct more tests with different pendulum dimensions to better understand the impact of physical attributes.
+							<li>Complete full pendulum movement with momentum-building swings for swing-up motion.
+							<li>Train a neural network to detect theta using combined sensor and camera data.
+						</ul>
+				</ul>
+				
+			<div class="divider"> </div>
+			<h1> Team </h1>
+			<h2> Names and short bios of each member </h2>
+			<p> 
+				<ul> 
+					<li>Artem Shumay: EECS, 4th Year.
+					<li>Sanzhar Abatov: Mech E, Super Senior, with expertise in robotics and mechatronics. 
+					<li>Gabriel Taboada: EECS, 4th Year, experience in computer vision.	
+				</ul>
+			</p>
+			
+			<h2> Major contributions </h2>
+			<p> 
+				<ul> 
+					<li>Artem: extensive testing, designed motor controller code, visualizer
+					<li>Sanzhar: Constructed mounts, designed gripper hardware, and ensured seamless integration of components.
+					<li>Gabriel: Data analysis, simulation, testing, camera code
+				</ul>
+			</p>
+			<div class="divider"> </div>
+			<h1> Additional materials </h1>
+			<h2> TODO </h2>
+			<p> 
+			<ul> 
+				Code, URDFs, and launch files: Available in the project repository (link provided below).
+				CAD models: Include designs for gripper attachments and mounts. 
+				Data sheets: Provide specifications for sensors, motors, and other components used.
+				Additional videos, images, or data: Videos of system performance and simulation are available upon request.
+				Links: Project GitHub repository: [Insert Link Here].
+			</ul>
+			</p>
+		</div>
+	</div>
+	
+	<!-- https://stackoverflow.com/questions/187619/is-there-a-javascript-solution-to-generating-a-table-of-contents-for-a-page -->
+	<script>
+		window.onload = function () {
+		var toc = "";
+		var level = 0;
+
+		document.getElementById("contents").innerHTML =
+			document.getElementById("contents").innerHTML.replace(
+				/<h([\d])>([^<]+)<\/h([\d])>/gi,
+				function (str, openLevel, titleText, closeLevel) {
+					if (openLevel != closeLevel) {
+						return str;
+					}
+
+					if (openLevel > level) {
+						if (level == 1) {
+							toc += (new Array(openLevel - level + 1)).join("<ul class=\"toc-ul\">");
+						} else {
+							toc += (new Array(openLevel - level + 1)).join("<ol class=\"toc-ul\">");
+						}
+					} else if (openLevel < level) {
+						toc += (new Array(level - openLevel + 1)).join("</ul>");
+					}
+
+					level = parseInt(openLevel);
+
+					var anchor = titleText.replace(/ /g, "_");
+					toc += "<li><a class=\"link\" href=\"#" + anchor + "\">" + titleText
+						+ "</a></li>";
+
+					return "<h" + openLevel + "><a name=\"" + anchor + "\">"
+						+ titleText + "</a></h" + closeLevel + ">";
+				}
+			);
+
+		if (level) {
+			toc += (new Array(level + 1)).join("</ol>");
+		}
+
+		document.getElementById("toc").innerHTML += toc;
+	};
+	</script>
+
+</body>
